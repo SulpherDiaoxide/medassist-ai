@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MedAssist AI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f9fc;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    input, textarea {
+      width: 80%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #2980b9;
+    }
+    .result {
+      margin-top: 30px;
+      text-align: left;
+      width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+    }
+    .disclaimer {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <h1>🩺 MedAssist AI</h1>
+
+  <textarea id="userMessage" placeholder="Enter your symptoms here..." rows="4"></textarea><br>
+  <button onclick="sendMessage()">Analyze</button>
+
+  <div class="result" id="reply"></div>
+
+  <div class="disclaimer">
+    ⚠️ This is not medical advice. Always consult a doctor.
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const userMessage = document.getElementById("userMessage").value;
+      if (!userMessage.trim()) {
+        alert("Please enter your symptoms!");
+        return;
+      }
+
+      const replyDiv = document.getElementById("reply");
+      replyDiv.innerText = "Analyzing...";
+
+      try {
+        const response = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await response.json();
+
+        if (data.reply) {
+          replyDiv.innerText = data.reply;
+        } else if (data.error) {
+          replyDiv.innerText = "⚠️ Error: " + data.error;
+        } else {
+          replyDiv.innerText = "⚠️ Unknown error";
+        }
+      } catch (err) {
+        replyDiv.innerText = "⚠️ Network error: " + err;
+      }
+    }
+  </script>
+</body>
+</html>
